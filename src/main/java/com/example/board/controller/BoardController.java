@@ -2,6 +2,8 @@ package com.example.board.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+
 import com.example.board.repository.PostRepository;
 
 import org.springframework.ui.Model;
@@ -18,21 +20,28 @@ import java.util.Optional;
 
 import org.springframework.validation.annotation.Validated;
 
+import com.example.board.validation.GroupOrder;
+
+//ƒGƒ‰[ƒƒbƒZ[ƒW‚Ìæ“¾‚Å—˜—p
+//import org.springframework.validation.ObjectError;
+
+
+
 /**
- * æ²ç¤ºæ¿ã®ãƒ•ãƒ­ãƒ³ãƒˆã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼.
+ * Œf¦”Â‚Ìƒtƒƒ“ƒgƒRƒ“ƒgƒ[ƒ‰[.
  */
 @Controller
 public class BoardController {
     
-    /**ã€€æŠ•ç¨¿ã®ä¸€è¦§ã€€*/
+    /**@“Še‚Ìˆê——@*/
     @Autowired
     private PostRepository repository;
 
     /**
-    * ä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹ã€‚
+    * ˆê——‚ğ•\¦‚·‚éB
     *
-    * @param model ãƒ¢ãƒ‡ãƒ«
-    * @return ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
+    * @param model ƒ‚ƒfƒ‹
+    * @return ƒeƒ“ƒvƒŒ[ƒg
     */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(Model model) {
@@ -43,26 +52,31 @@ public class BoardController {
     }
     
     /**
-     * ä¸€è¦§ã‚’è¨­å®šã™ã‚‹ã€‚
+     * ˆê——‚ğİ’è‚·‚éB
      * 
-     * @param modelã€€ãƒ¢ãƒ‡ãƒ«
-     * @return ä¸€è¦§ã‚’è¨­å®šã—ãŸãƒ¢ãƒ‡ãƒ«
+     * @param model@ƒ‚ƒfƒ‹
+     * @return ˆê——‚ğİ’è‚µ‚½ƒ‚ƒfƒ‹
      */
     private Model setList(Model model){
-        Iterable<Post> list = repository.findAll();
+        
+        //XV“ú‚ÌV‚µ‚¢‡‚É•À‚Ñ‘Ö‚¦
+        //Iterable<Post> list = repository.findAllByOrderByUpdatedDateDesc();
+        //Iterable<Post> list = repository.findAll(Sort.by(Sort.Direction.DESC,"updateDate"));
+        
+        Iterable<Post> list = repository.findByDeletedFalseOrderByUpdatedDateDesc();
         model.addAttribute("list",list);
         return model;
     }
     
     /**
-     * ç™»éŒ²ã™ã‚‹ã€‚
+     * “o˜^‚·‚éB
      * 
-     * @param form ãƒ•ã‚©ãƒ¼ãƒ 
-     * @param model ãƒ¢ãƒ‡ãƒ«
-     * @return ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
+     * @param form ƒtƒH[ƒ€
+     * @param model ƒ‚ƒfƒ‹
+     * @return ƒeƒ“ƒvƒŒ[ƒg
      */
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public String cleate(@ModelAttribute("form") @Validated Post form, BindingResult result, Model model) {
+    public String cleate(@ModelAttribute("form") @Validated(GroupOrder.class) Post form, BindingResult result, Model model) {
         if(!result.hasErrors()) {
             repository.saveAndFlush(PostFactory.createPost(form));
             model.addAttribute("form",PostFactory.newPost());
@@ -73,30 +87,30 @@ public class BoardController {
     }
     
     /**
-     * ç·¨é›†ã™ã‚‹å†…å®¹ã‚’è¡¨ç¤ºã™ã‚‹
+     * •ÒW‚·‚é“à—e‚ğ•\¦‚·‚é
      * 
-     * @param formã€€ãƒ•ã‚©ãƒ¼ãƒ 
-     * @param modelã€€ãƒ¢ãƒ‡ãƒ«
-     * @returnã€€ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
+     * @param form@ƒtƒH[ƒ€
+     * @param model@ƒ‚ƒfƒ‹
+     * @return@ƒeƒ“ƒvƒŒ[ƒg
      */
     @RequestMapping(value = "/edit", method = RequestMethod.GET)
     public String edit(@ModelAttribute("form") Post form,Model model) {
         Optional<Post> post = repository.findById(form.getId());
-        model.addAttribute("form",post);
+        model.addAttribute("form",post.get());
         model = this.setList(model);
         model.addAttribute("path", "update");
         return "layout";
     }
     
     /**
-     * æ›´æ–°
+     * XV
      * 
-     * @param formã€€ãƒ•ã‚©ãƒ¼ãƒ ã€€
-     * @param modelã€€ãƒ¢ãƒ‡ãƒ«
-     * @returnã€€ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
+     * @param form@ƒtƒH[ƒ€@
+     * @param model@ƒ‚ƒfƒ‹
+     * @return@ƒeƒ“ƒvƒŒ[ƒg
      */
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public String update(@ModelAttribute("form") @Validated Post form, BindingResult result, Model model) {
+    public String update(@ModelAttribute("form") @Validated(GroupOrder.class) Post form, BindingResult result, Model model) {
         if(!result.hasErrors()) {
             Optional<Post> post = repository.findById(form.getId());
             repository.saveAndFlush(PostFactory.updatePost(post.get(), form));
@@ -108,11 +122,11 @@ public class BoardController {
     }
     
     /**
-     * å‰Šé™¤ã™ã‚‹
+     * íœ‚·‚é
      * 
-     * @param formã€€ãƒ•ã‚©ãƒ¼ãƒ 
-     * @param modelã€€ãƒ¢ãƒ‡ãƒ«
-     * @returnã€€ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ
+     * @param form@ƒtƒH[ƒ€
+     * @param model@ƒ‚ƒfƒ‹
+     * @return@ƒeƒ“ƒvƒŒ[ƒg
      */
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
     public String delete(@ModelAttribute("form") Post form,Model model) {

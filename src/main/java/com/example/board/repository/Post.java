@@ -12,13 +12,18 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.example.board.validation.Group1;
+import com.example.board.validation.Group2;
+
 /**
- * æŠ•ç¨¿.
+ * “Še
  */
 @Entity
 @Table(name = "post")
 @Data
 public class Post {
+    
 
     /** ID */
     @NotNull
@@ -27,34 +32,34 @@ public class Post {
     @Column
     private String id = null;
 
-    /** æŠ•ç¨¿è€… */
-    @NotEmpty
-    @Size(min = 1,max = 20)
+    /** “ŠeÒ */
+    @NotEmpty(groups = Group1.class)
+    @Size(min = 1,max = 20, groups = Group2.class)
     
     @Column(length = 20, nullable = false)
     private String author = null;
 
-    /** ã‚¿ã‚¤ãƒˆãƒ« */
-    @NotEmpty
-    @Size(min = 1,max = 20)
+    /** ƒ^ƒCƒgƒ‹ */
+    @NotEmpty(groups = Group1.class)
+    @Size(min = 1,max = 20, groups = Group2.class)
     
     @Column(length = 20, nullable = false)
     private String title = null;
 
-    /** å†…å®¹ */
-    @NotEmpty
-    @Size(min = 1,max = 1000)
+    /** “à—e */
+    @NotEmpty(groups = Group1.class)
+    @Size(min = 1,max = 1000, groups = Group2.class)
     
     @Column(length = 1000, nullable = false)
     private String body = null;
 
-    /** ç™»éŒ²æ—¥æ™‚ */
+    /** “Še“ú */
     private Date createdDate = null;
 
-    /** æ›´æ–°æ—¥æ™‚ */
+    /** XV“ú */
     private Date updatedDate = null;
 
-    /** å‰Šé™¤æ¸ˆ */
+    /** íœÏ */
     private boolean deleted = false;
 
 }
